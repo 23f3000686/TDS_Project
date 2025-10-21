@@ -310,8 +310,14 @@ def process_task(data: dict):
 @app.post("/send_task/")
 async def receive_callback(request: Request):
     data = await request.json()
+    round_number = data["round"]
+    task = data["task"]
+    nonce = data["nonce"]
+    repo_name = f"{task}_{nonce}"
+    github_url = f"https://23f3000686.github.io/{repo_name}/"
+
     print("📬 Callback received:", data)
-    return {"status": "✅ Callback received successfully"}
+    return {"status": "✅ Callback received successfully", "round":round_number, "url":github_url}
 
 if __name__ == "__main__":
     import uvicorn
