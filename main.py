@@ -11,7 +11,7 @@
 import os
 import requests
 import base64
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from openai import OpenAI
 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
@@ -307,7 +307,12 @@ def process_task(data: dict):
         except Exception as e:
             print(f"⚠️ Callback failed: {e}")
 
+@app.post("/send_task/")
+async def receive_callback(request: Request):
+    data = await request.json()
+    print("📬 Callback received:", data)
+    return {"status": "✅ Callback received successfully"}
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
-
