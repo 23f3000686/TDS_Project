@@ -271,6 +271,7 @@ async def handle_task(data: dict, background_tasks: BackgroundTasks):
             "url": None
         }
 
+
 def process_task(data: dict):
     """Run round logic and callback after completion."""
     round_number = data["round"]
@@ -295,17 +296,21 @@ def process_task(data: dict):
 
     # ✅ Send callback to client/instructor
     callback_url = data.get("callback_url") or data.get("evaluation_url")
-
+    payload = {
+    "task": data.get("task"),
+    "round": data.get("round"),
+    "nonce": data.get("nonce"),
+    "url": github_url,
+    "status": "success"
+    }
     if callback_url:
         try:
             print(f"📤 Sending completion callback to {callback_url}")
-            resp = requests.post(callback_url, json={
-                "message": f"✅ Round {round_number} task completed",
-                "url": github_url
-            }, timeout=10)
-            print(f"📬 Callback response: {resp.status_code}")
+            resp = requests.post(callback_url, json=payload, timeout=10)
+            print(f"📬 Callback response: {resp.status_code}, {resp.text}")
         except Exception as e:
             print(f"⚠️ Callback failed: {e}")
+
 
 @app.post("/send_task/")
 async def receive_callback(request: Request):
